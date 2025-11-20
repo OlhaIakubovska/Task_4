@@ -10,6 +10,14 @@ pipeline {
             }
         }
 
+        stage('Restore NuGet Packages') {
+            steps {
+                echo 'Restoring NuGet packages...'
+                bat "nuget restore test_repos.sln"
+            }
+        }
+
+
         stage('Build') {
             steps {
                 echo 'Building solution with MSBuild...'

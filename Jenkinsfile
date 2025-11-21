@@ -10,39 +10,33 @@ pipeline {
             }
         }
 
-        stage('Restore NuGet Packages') {
+        stage('Restore NuGet') {
             steps {
                 echo 'Restoring NuGet packages...'
-                bat "nuget restore test_repos.sln"
+                bat '"C:\\Program Files\\NuGet\\nuget.exe" restore test_repos.sln'
             }
         }
-
 
         stage('Build') {
             steps {
                 echo 'Building solution with MSBuild...'
-                bat '"C:\\Program Files\\NuGet\\nuget.exe" restore test_repos.sln'
+                bat "\"${tool 'MSBuild_17'}\" test_repos.sln /p:Configuration=Debug /p:Platform=x64"
             }
         }
 
         stage('Run Tests') {
             steps {
-                echo 'Running Google Tests...'
-                bat ".\\x64\\Debug\\test_repos.exe --gtest_output=xml:test_results.xml"
+                bat 'x64\\Debug\\test_repos.exe --gtest_output="xml:test_report.xml"'
             }
         }
 
         stage('Test Report') {
             steps {
-                echo 'Publishing test results...'
-                junit allowEmptyResults: true, testResults: '**/test_results.xml'
+                xunit {
+                    googleTest(pattern: 'test_report.xml')
+                }
             }
         }
-    }
 
-    post {
-        always {
-            echo 'Pipeline finished.'
-        }
     }
 }

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -30,10 +30,11 @@
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings" />
-  <ImportGroup Label="Shared" />
-  <ImportGroup Label="PropertySheets" />
-  <PropertyGroup Label="UserMacros" />
+
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\googletest.redist.1.8.3\build\native\googletest.redist.targets" Condition="Exists('packages\googletest.redist.1.8.3\build\native\googletest.redist.targets')" />
+    <Import Project="packages\googletest.1.8.3\build\native\googletest.targets" Condition="Exists('packages\googletest.1.8.3\build\native\googletest.targets')" />
+  </ImportGroup>
 
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -42,84 +43,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ClCompile Include="test.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="test.cpp" />
   </ItemGroup>
 
   <ItemGroup>
     <Text Include="Jenkinsfile" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
 
-  <ItemDefinitionGroup />
-
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="packages\googletest.redist.1.8.3\build\native\googletest.redist.targets" Condition="Exists('packages\googletest.redist.1.8.3\build\native\googletest.redist.targets')" />
-    <Import Project="packages\googletest.1.8.3\build\native\googletest.targets" Condition="Exists('packages\googletest.1.8.3\build\native\googletest.targets')" />
-  </ImportGroup>
-
-  <!-- Debug Win32 -->
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <WarningLevel>Level3</WarningLevel>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-    </Link>
-  </ItemDefinitionGroup>
-
-  <!-- Debug x64 -->
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>X64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <WarningLevel>Level3</WarningLevel>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-    </Link>
-  </ItemDefinitionGroup>
-
-  <!-- Release Win32 -->
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-    </Link>
-  </ItemDefinitionGroup>
-
-  <!-- Release x64 -->
+  <!-- Конфігурації Release x64 з правильними бібліотеками GoogleTest -->
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -134,11 +72,13 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalDependencies>googletest_v141.lib;gtest.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gtest_main.lib;gtest.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>packages\googletest.1.8.3\lib\native\v140\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
 
+  <!-- Інші конфігурації Debug/Win32, Release/Win32, Debug/x64 можна залишити без змін або аналогічно додати AdditionalDependencies -->
+  
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
@@ -147,4 +87,5 @@
     <Error Condition="!Exists('packages\googletest.1.8.3\build\native\googletest.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\googletest.1.8.3\build\native\googletest.targets'))" />
   </Target>
 
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

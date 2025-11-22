@@ -10,24 +10,23 @@ pipeline {
             }
         }
 
-        stage('Restore NuGet') {
+        // !!! ВИДАЛЕНО stage('Restore NuGet') - його функцію перенесено в Build & Test !!!
+        
+        stage('Build & Restore') {
             steps {
-                echo 'Restoring NuGet packages...'
-                bat '"C:\\Program Files\\NuGet\\nuget.exe" restore test_repos.sln'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                echo 'Building solution with MSBuild...'
-                bat '"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe" test_repos.sln /t:Build /p:Configuration=Release'
+                echo 'Restoring NuGet packages and Building solution with MSBuild...'
+                // ВИКОРИСТАННЯ MSBuild З ПАРАМЕТРОМ /p:Restore=true
+                // Зверніть увагу, що ми збираємо конфігурацію Release|x64
+                bat '"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe" test_repos.sln /t:Build /p:Configuration=Release /p:Platform=x64 /p:Restore=true' 
             }
         }
 
 
         stage('Run Tests') {
             steps {
-                bat 'x64\\Debug\\test_repos.exe --gtest_output="xml:test_report.xml"'
+                echo 'Running tests (Release|x64)...'
+                // УЗГОДЖЕННЯ: Змінено "Debug" на "Release", щоб відповідати попередньому етапу збірки.
+                bat 'x64\\Release\\test_repos.exe --gtest_output="xml:test_report.xml"'
             }
         }
 

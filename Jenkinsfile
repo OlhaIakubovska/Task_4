@@ -20,9 +20,10 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building solution with MSBuild...'
-                bat "\"${tool 'MSBuild_17'}\" test_repos.sln /p:Configuration=Debug /p:Platform=x64"
+                bat '"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe" test_repos.sln /t:Build /p:Configuration=Release'
             }
         }
+
 
         stage('Run Tests') {
             steps {
